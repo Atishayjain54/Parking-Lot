@@ -36,7 +36,6 @@ namespace Task1
             {
                 ParkingSlot parkingSlot = new ParkingSlot(i + 1, VehicleType.TwoWheeler, false);
                 ParkingSlots[i] = parkingSlot;
-
             }
             for (int i = TwoWheelerSlots; i < TwoWheelerSlots + FourWheelerSlots; i++)
             {
@@ -60,60 +59,58 @@ namespace Task1
             }
             return -1;
         }
-        public int ChooseOption()
+        public static bool CheckVehicleNumber(string VehickleNumber)
         {
+            if (VehickleNumber.Length == 10)
+            {
+                return true;
+            }
 
-            Console.WriteLine("What do you want to do, Please select one option");
-            Console.WriteLine("1 : Park the Vehicle");
-            Console.WriteLine("2 : Unpark the Vehicle");
-            Console.WriteLine("3 : Check Occupancy of the ParkingLot");
-            Console.WriteLine("4 : Exit");
-
-            int Option = Convert.ToInt32(Console.ReadLine());
-            return Option;
+            return false;
         }
         public void ParkVehicle(VehicleType VehicleType, string VehicleNumber)
         {
             int SlotNumber = 0;
             if (VehicleType == VehicleType.TwoWheeler)
-            {
+            { 
                 SlotNumber = ChechAvailability(VehicleType.TwoWheeler);
-                if (ChechAvailability(VehicleType.TwoWheeler) != -1)
+                if (SlotNumber != -1)
                 {
-                    Console.WriteLine("\nEnter The Vehicle Number for two Wheeler");
-                    VehicleNumber = Console.ReadLine();
-                    OccupiedTwoWheelerSlots++;
-                    Console.WriteLine("\n Here is your Ticket Details");
-                    DateTime CurrentTime = DateTime.Now;
-                    string TicketId = CurrentTime.ToString("yyyyMMddHHmmss");
-                    ParkingTicket ticket = new ParkingTicket(SlotNumber, VehicleNumber, DateTime.Now, "TW" + TicketId);
-                    Console.WriteLine("Parking ticket issued.\n Ticket ID : " + ticket.TicketId + " \nSlot number: " + ticket.SlotNumber + "\n Vehicle number: " + ticket.VehicleNumber + "\nIn Time: " + ticket.InTime);
-                    Tickets.Add(ticket);
-                    ParkingSlots[SlotNumber - 1].VehicleNumber = VehicleNumber;
-                    ParkingSlots[SlotNumber - 1].IsOccupied = true;
+                    VehicleNumber = Methods.ParkingVehicle(VehicleNumber, SlotNumber);
+
+                    if (CheckVehicleNumber(VehicleNumber))
+                    {
+
+                        ParkingTicket ticket = Methods.GetTicket(SlotNumber, VehicleNumber, VehicleType);
+                        Tickets.Add(ticket);
+                        ParkingSlots[SlotNumber - 1].VehicleNumber = VehicleNumber;
+                        ParkingSlots[SlotNumber - 1].IsOccupied = true;
+                        OccupiedTwoWheelerSlots++;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Please Enter Valid Vehicle Number");
+
+                    }
                 }
                 else
                 {
                     Console.WriteLine("Slot is Not Available for two Wheeler");
+                    Console.WriteLine("\n");
                 }
-                Console.WriteLine("\n");
-            }
+           }
             else if (VehicleType == VehicleType.FourWheeler)
             {
                 SlotNumber = ChechAvailability(VehicleType.FourWheeler);
-                if (ChechAvailability(VehicleType.FourWheeler) != -1)
+                if (SlotNumber != -1)
                 {
-                    OccupiedFourWheelerSlots++;
-                    Console.WriteLine("Enter The Vehicle Number for Four Wheeler");
-                    VehicleNumber = Console.ReadLine();
-                    Console.WriteLine("\n Here is your Ticket Details");
-                    DateTime CurrentTime = DateTime.Now;
-                    string TicketId = CurrentTime.ToString("yyyyMMddHHmmss");
-                    ParkingTicket ticket = new ParkingTicket(SlotNumber, VehicleNumber, DateTime.Now, "FW" + TicketId);
-                    Console.WriteLine("Parking ticket issued.\n Ticket ID : " + ticket.TicketId + " \nSlot number: " + ticket.SlotNumber + "\n Vehicle number: " + ticket.VehicleNumber + "\nIn Time: " + ticket.InTime);
+                    VehicleNumber = Methods.ParkingVehicle(VehicleNumber, SlotNumber);
+
+                    ParkingTicket ticket = Methods.GetTicket(SlotNumber, VehicleNumber, VehicleType);
                     Tickets.Add(ticket);
                     ParkingSlots[SlotNumber - 1].VehicleNumber = VehicleNumber;
                     ParkingSlots[SlotNumber - 1].IsOccupied = true;
+                    OccupiedFourWheelerSlots++;
                 }
                 else
                 {
@@ -124,19 +121,15 @@ namespace Task1
             else if (VehicleType == VehicleType.HeavyVehicle)
             {
                 SlotNumber = ChechAvailability(VehicleType.HeavyVehicle);
-                if (ChechAvailability(VehicleType.HeavyVehicle) != -1)
+                if (SlotNumber != -1)
                 {
-                    Console.WriteLine("Enter The Vehicle Number for Heavy Vehicle");
-                    VehicleNumber = Console.ReadLine();
-                    OccupiedHeavyVehicleSlots++;
-                    Console.WriteLine("\n Here is your Ticket Details");
-                    DateTime CurrentTime = DateTime.Now;
-                    string TicketId = CurrentTime.ToString("yyyyMMddHHmmss");
-                    ParkingTicket ticket = new ParkingTicket(SlotNumber, VehicleNumber, DateTime.Now, "HV" + TicketId);
-                    Console.WriteLine("Parking ticket issued.\n Ticket ID : " + ticket.TicketId + " \nSlot number: " + ticket.SlotNumber + "\n Vehicle number: " + ticket.VehicleNumber + "\nIn Time: " + ticket.InTime);
+                    VehicleNumber = Methods.ParkingVehicle(VehicleNumber, SlotNumber);
+
+                    ParkingTicket ticket = Methods.GetTicket(SlotNumber, VehicleNumber, VehicleType);
                     Tickets.Add(ticket);
                     ParkingSlots[SlotNumber - 1].VehicleNumber = VehicleNumber;
                     ParkingSlots[SlotNumber - 1].IsOccupied = true;
+                    OccupiedHeavyVehicleSlots++;
                 }
                 else
                 {
@@ -170,22 +163,17 @@ namespace Task1
                         OccupiedHeavyVehicleSlots--;
                         ParkingSlots[slot - 1].IsOccupied = false;
                     }
-
-                    ticket.OutTime = DateTime.Now;
-                    Console.WriteLine("Unparking ticket issued.\n Slot number :" + ticket.SlotNumber + " \n Vehicle number: " + ticket.VehicleNumber + "\nIn Time :" + ticket.InTime + "\nOut Time :" + ticket.OutTime);
-                    Console.WriteLine("\n Unparked");
-                    Console.WriteLine("\n******************");
+                    Methods.UpdateTicket(ticket);
+                    ParkingFee(ticket);
                     return;
                 }
             }
             Console.WriteLine("Invalid Ticket ID");
             Console.WriteLine("\n******************");
         }
-
         public void DisplayOccupancy()
         {
             Console.WriteLine("Checking Occupancy");
-            Console.WriteLine("\n");
             Console.WriteLine("\n");
             Console.WriteLine("Number of Two Wheeler Slot :" + TwoWheelerSlots);
             Console.WriteLine("Number of Four Wheeler Slot :" + FourWheelerSlots);
@@ -193,9 +181,23 @@ namespace Task1
 
             Console.WriteLine("\nOccupied Slots:");
 
-            Console.WriteLine("Number of Occupied TwoWheeler Slot :" + OccupiedTwoWheelerSlots);
-            Console.WriteLine("Number of Occupied FourWheeler Slot :" + OccupiedFourWheelerSlots);
-            Console.WriteLine("Number of Occupied HeavyVehicle Slot :" + OccupiedHeavyVehicleSlots);
+            Console.WriteLine("Number of Available TwoWheeler Slot :" + (TwoWheelerSlots - OccupiedTwoWheelerSlots));
+            Console.WriteLine("Number of Available FourWheeler Slot :" + (FourWheelerSlots - OccupiedFourWheelerSlots));
+            Console.WriteLine("Number of Available HeavyVehicle Slot :" +(HeavyVehicleSlots - OccupiedHeavyVehicleSlots));
+            Console.WriteLine("\n******************");
+        }
+        public void ParkingFee(ParkingTicket Ticket)
+        {
+            double parkingRate = 0.05;
+
+            DateTime InTime = Ticket.InTime;
+            DateTime OutTime = Ticket.OutTime;
+
+            TimeSpan elapsed = OutTime - InTime;
+
+            double TotalPrice = elapsed.TotalMinutes * parkingRate;
+
+            Console.WriteLine("\nTotal parking price: $" + TotalPrice.ToString("0.00"));
             Console.WriteLine("\n******************");
         }
     }
