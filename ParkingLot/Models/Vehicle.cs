@@ -6,14 +6,6 @@ using System.Threading.Tasks;
 
 namespace Task1;
 
- class Vehicle
- {
-    public string VehicleNumber { get; set; }
-
-    public VehicleType Type { get; set; }
-
- }
-
  public enum VehicleType
  {
     TwoWheeler,
