@@ -17,8 +17,9 @@ namespace Task1
         public string VehicleNumber { get; set; }
         public DateTime InTime { get; set; }
         public DateTime OutTime { get; set; }
-
         public string TicketId { get; set; }
+
+        public VehicleType VehicleType { get; set; }
 
 
         public ParkingTicket(int SlotNumber, string VehicleNumber, DateTime InTime,string TicketId)
