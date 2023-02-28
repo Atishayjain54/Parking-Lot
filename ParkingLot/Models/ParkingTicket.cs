@@ -18,8 +18,8 @@ namespace Task1
         public DateTime InTime { get; set; }
         public DateTime OutTime { get; set; }
         public string TicketId { get; set; }
-
         public VehicleType VehicleType { get; set; }
+        public double ParkingFee { get; set; }
 
 
         public ParkingTicket(int SlotNumber, string VehicleNumber, DateTime InTime,string TicketId)

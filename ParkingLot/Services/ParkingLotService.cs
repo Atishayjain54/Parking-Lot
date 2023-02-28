@@ -16,33 +16,35 @@ namespace Task1
 
         public List<ParkingTicket> Tickets = new List<ParkingTicket>();
 
-        public Dictionary<VehicleType, int> VehicleSlots = new Dictionary<VehicleType, int>();
-        public Dictionary<VehicleType, int> OccupiedSlots = new Dictionary<VehicleType, int>();
+        public int TwoWheelerSlots { get; set; }
+        public int FourWheelerSlots { get; set; }
+        public int HeavyVehicleSlots { get; set; }
+
+        public int OccupiedTwoWheelerSlots { get; set;} = 0;
+        public int OccupiedFourWheelerSlots { get; set; } = 0;
+        public int OccupiedHeavyVehicleSlots { get; set; } = 0;
+
+       // public Dictionary<VehicleType, int[]> VehicleSlots = new Dictionary<VehicleType, int[]>();
 
         public ParkingLotService(int twoWheelerSlot, int fourWheelerSlot, int heavyVehicles)
         {
-            VehicleSlots.Add(VehicleType.TwoWheeler, twoWheelerSlot);
-            VehicleSlots.Add(VehicleType.FourWheeler, fourWheelerSlot);
-            VehicleSlots.Add(VehicleType.HeavyVehicle, heavyVehicles);
+            TwoWheelerSlots = twoWheelerSlot;
+            FourWheelerSlots = fourWheelerSlot;
+            HeavyVehicleSlots = heavyVehicles;
 
-            OccupiedSlots.Add(VehicleType.TwoWheeler, 0);
-            OccupiedSlots.Add(VehicleType.FourWheeler, 0);
-            OccupiedSlots.Add(VehicleType.HeavyVehicle, 0);
+            ParkingSlots = new ParkingSlot[twoWheelerSlot + fourWheelerSlot + heavyVehicles];
 
-
-        ParkingSlots = new ParkingSlot[twoWheelerSlot + fourWheelerSlot + heavyVehicles];
-
-            for (int i = 0; i < VehicleSlots[VehicleType.TwoWheeler]; i++)
+            for (int i = 0; i < TwoWheelerSlots; i++)
             {
                 ParkingSlot parkingSlot = new ParkingSlot(i + 1, VehicleType.TwoWheeler, false);
                 ParkingSlots[i] = parkingSlot;
             }
-            for (int i = VehicleSlots[VehicleType.TwoWheeler]; i < VehicleSlots[VehicleType.TwoWheeler] + VehicleSlots[VehicleType.FourWheeler]; i++)
+            for (int i = TwoWheelerSlots; i < TwoWheelerSlots + FourWheelerSlots; i++)
             {
                 ParkingSlot parkingSlot = new ParkingSlot(i + 1, VehicleType.FourWheeler, false);
                 ParkingSlots[i] = parkingSlot;
             }
-            for (int i = VehicleSlots[VehicleType.TwoWheeler] + VehicleSlots[VehicleType.FourWheeler]; i < VehicleSlots[VehicleType.TwoWheeler] + VehicleSlots[VehicleType.FourWheeler] + VehicleSlots[VehicleType.HeavyVehicle]; i++)
+            for (int i = TwoWheelerSlots + FourWheelerSlots; i < TwoWheelerSlots + FourWheelerSlots + HeavyVehicleSlots; i++)
             {
                 ParkingSlot parkingSlot = new ParkingSlot(i + 1, VehicleType.HeavyVehicle, false);
                 ParkingSlots[i] = parkingSlot;
@@ -68,17 +70,17 @@ namespace Task1
         {
             if (VehicleType == VehicleType.TwoWheeler)
             {
-                OccupiedSlots[VehicleType.TwoWheeler]++;
+                OccupiedTwoWheelerSlots++;
             }
 
             else if (VehicleType == VehicleType.FourWheeler)
             {
-                OccupiedSlots[VehicleType.FourWheeler]++;
+                OccupiedFourWheelerSlots++;
             }
 
             else if (VehicleType == VehicleType.HeavyVehicle)
             {
-                OccupiedSlots[VehicleType.HeavyVehicle]++;
+                OccupiedHeavyVehicleSlots++;
             }
 
             ParkingTicket ticket = GenerateTicket(SlotNumber, VehicleNumber, VehicleType);
@@ -92,21 +94,21 @@ namespace Task1
         public ParkingTicket GenerateTicket(int SlotNumber, string VehicleNumber, VehicleType VehicleType)
         {
             DateTime CurrentTime = DateTime.Now;
-            string TicketId = "";
+            string ticketId = "";
 
             if (VehicleType == VehicleType.TwoWheeler)
             {
-                TicketId = "TW" + VehicleNumber.Substring(0, 4) + CurrentTime.ToString("yyyyMMddHHmmss");
+                ticketId = "TW" + VehicleNumber.Substring(0, 4) + CurrentTime.ToString("yyyyMMddHHmmss");
             }
             else if (VehicleType == VehicleType.FourWheeler)
             {
-                TicketId = "FW" + VehicleNumber.Substring(0, 4) + CurrentTime.ToString("yyyyMMddHHmmss");
+                ticketId = "FW" + VehicleNumber.Substring(0, 4) + CurrentTime.ToString("yyyyMMddHHmmss");
             }
             else
             {
-                TicketId = "HV" + VehicleNumber.Substring(0, 4) + CurrentTime.ToString("yyyyMMddHHmmss");
+                ticketId = "HV" + VehicleNumber.Substring(0, 4) + CurrentTime.ToString("yyyyMMddHHmmss");
             }
-            ParkingTicket ticket = new ParkingTicket(SlotNumber, VehicleNumber, DateTime.Now, TicketId);
+            ParkingTicket ticket = new ParkingTicket(SlotNumber, VehicleNumber, DateTime.Now, ticketId);
             return ticket;
         }
         public ParkingTicket UnParkVehicle(string TicketId)
@@ -120,28 +122,28 @@ namespace Task1
                 switch (ParkingSlots[slot - 1].VehicleType)
                 {
                     case VehicleType.TwoWheeler:
-                        OccupiedSlots[VehicleType.TwoWheeler]--;
+                        OccupiedTwoWheelerSlots--;
                         break;
                     case VehicleType.FourWheeler:
-                        OccupiedSlots[VehicleType.FourWheeler]--;
+                        OccupiedFourWheelerSlots--;
                         break;
                     case VehicleType.HeavyVehicle:
-                        OccupiedSlots[VehicleType.HeavyVehicle]--;
+                        OccupiedHeavyVehicleSlots--;
                         break;
                 }
                 ParkingSlots[slot - 1].IsOccupied = false;
-                ParkingFee(ticket);
+                ticket.OutTime = DateTime.Now;
+                CalculateParkingFee(ticket);
 
                 return ticket;
             }
             return null;
         }
-        public double ParkingFee(ParkingTicket Ticket)
-{
-    Ticket.OutTime = DateTime.Now;
-
-    double parkingRate = 0;
-    double parkingDuration = (Ticket.OutTime - Ticket.InTime).TotalMinutes;
+        public void CalculateParkingFee(ParkingTicket Ticket)
+        {
+           
+           double parkingRate = 0;
+           double parkingDuration = (Ticket.OutTime - Ticket.InTime).TotalMinutes;
             switch (Ticket.VehicleType)
             {
                 case VehicleType.TwoWheeler:
@@ -158,10 +160,23 @@ namespace Task1
                 default:
                     break;
             }
-    double parkingFee = parkingRate * parkingDuration;
+             double parkingFee = parkingRate * parkingDuration;
 
-    return parkingFee;
-}
+         Ticket.ParkingFee = parkingFee;
+        }
+        public Dictionary<VehicleType, int[]> GetOccupancyDetails()
+        {
+            Dictionary<VehicleType, int[]> VehicleSlots = new Dictionary<VehicleType, int[]>()
+            {
+             {VehicleType.TwoWheeler, new int[] {TwoWheelerSlots,OccupiedTwoWheelerSlots} },
+             {VehicleType.FourWheeler, new int[] {FourWheelerSlots,OccupiedFourWheelerSlots} },
+             {VehicleType.HeavyVehicle, new int[] {HeavyVehicleSlots,OccupiedHeavyVehicleSlots}}
+            };
+            Console.WriteLine(VehicleSlots[VehicleType.TwoWheeler][1]);
+            Console.WriteLine(VehicleSlots[VehicleType.FourWheeler][1]);
+            Console.WriteLine(VehicleSlots[VehicleType.HeavyVehicle][1]);
+           return VehicleSlots;
+        }
     }
 }
 
