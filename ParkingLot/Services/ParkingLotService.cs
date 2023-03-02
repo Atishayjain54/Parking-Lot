@@ -19,13 +19,9 @@ namespace Task1
         public int TwoWheelerSlots { get; set; }
         public int FourWheelerSlots { get; set; }
         public int HeavyVehicleSlots { get; set; }
-
         public int OccupiedTwoWheelerSlots { get; set;} = 0;
         public int OccupiedFourWheelerSlots { get; set; } = 0;
         public int OccupiedHeavyVehicleSlots { get; set; } = 0;
-
-       // public Dictionary<VehicleType, int[]> VehicleSlots = new Dictionary<VehicleType, int[]>();
-
         public ParkingLotService(int twoWheelerSlot, int fourWheelerSlot, int heavyVehicles)
         {
             TwoWheelerSlots = twoWheelerSlot;
@@ -172,9 +168,6 @@ namespace Task1
              {VehicleType.FourWheeler, new int[] {FourWheelerSlots,OccupiedFourWheelerSlots} },
              {VehicleType.HeavyVehicle, new int[] {HeavyVehicleSlots,OccupiedHeavyVehicleSlots}}
             };
-            Console.WriteLine(VehicleSlots[VehicleType.TwoWheeler][1]);
-            Console.WriteLine(VehicleSlots[VehicleType.FourWheeler][1]);
-            Console.WriteLine(VehicleSlots[VehicleType.HeavyVehicle][1]);
            return VehicleSlots;
         }
     }

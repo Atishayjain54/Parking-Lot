@@ -1,8 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Cryptography.X509Certificates;
-using Task1;
+﻿using System;
 
 namespace Task1
 {
@@ -10,20 +6,28 @@ namespace Task1
     {
         static void Main(string[] args)
         {
+            int NumberOfTwoWheelerSlot, NumberOfFourWheelerSlot, NumberOfHeavyVehicle;
+            ParkingLotService ParkingLot;
 
-            Console.WriteLine("Enter Number of Two Wheeler Slot");
+            while (true)
+            {
+                try
+                {
+                    Console.WriteLine("Enter Number of Two Wheeler Slot");
+                    NumberOfTwoWheelerSlot = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Enter Number of Four Wheeler Slot");
+                    NumberOfFourWheelerSlot = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Enter Number of Heavy Vehicle Slot");
+                    NumberOfHeavyVehicle = Convert.ToInt32(Console.ReadLine());
 
-            int NumberOfTwoWheelerSlot = Convert.ToInt32(Console.ReadLine());
-
-            Console.WriteLine("Enter Number of Four Wheeler Slot");
-
-            int NumberOfFourWheelerSlot = Convert.ToInt32(Console.ReadLine());
-
-            Console.WriteLine("Enter Number of Heavy Vehicle Slot");
-
-            int NumberOfHeavyVehicle = Convert.ToInt32(Console.ReadLine());
-
-            ParkingLotService ParkingLot = new ParkingLotService(NumberOfTwoWheelerSlot, NumberOfFourWheelerSlot, NumberOfHeavyVehicle);
+                    ParkingLot = new ParkingLotService(NumberOfTwoWheelerSlot, NumberOfFourWheelerSlot, NumberOfHeavyVehicle);
+                    break;
+                }
+                catch (FormatException e)
+                {
+                    Console.WriteLine("Invalid input! Please enter a valid Integer.");
+                }
+            }
 
             int Option = 0;
             while (Option != 4)
@@ -34,36 +38,38 @@ namespace Task1
                 Console.WriteLine("3: Display parking lot occupancy");
                 Console.WriteLine("4: Exit");
 
-                Option = Convert.ToInt32(Console.ReadLine());
-                switch (Option)
+                try
                 {
-                    case 1:
+                    Option = Convert.ToInt32(Console.ReadLine());
 
-                        Simulation.ParkVehicle(ParkingLot);
-                        break;
+                    switch (Option)
+                    {
+                        case 1:
+                            Simulation.ParkVehicle(ParkingLot);
+                            break;
 
-                    case 2:
+                        case 2:
+                            Simulation.UnParkVehicle(ParkingLot);
+                            break;
 
-                        Simulation.UnParking(ParkingLot);
-                        break;
+                        case 3:
+                            Simulation.DisplayOccupancy(ParkingLot);
+                            break;
 
-                    case 3:
+                        case 4:
+                            Console.WriteLine("Thank you");
+                            Console.WriteLine("\n******************");
+                            break;
 
-                        Simulation.CheckOccupancy(ParkingLot);
-                        break;
-
-                    case 4:
-
-                        Console.WriteLine("Thank you");
-                        Console.WriteLine("\n******************");
-                        break;
-
-                    default:
-
-                        Console.WriteLine("Invalid input");
-                        Console.WriteLine("\n******************");
-                        break;
-
+                        default:
+                            Console.WriteLine("Invalid input");
+                            Console.WriteLine("\n******************");
+                            break;
+                    }
+                }
+                catch (FormatException e)
+                {
+                    Console.WriteLine("Invalid input! Please enter a valid integer.");
                 }
             }
         }

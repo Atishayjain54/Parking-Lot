@@ -8,10 +8,8 @@ using Task1;
 
 namespace Task1
 {
-
     class ParkingSlot
     {
-
         public int SlotNumber { get; set; }
         public string VehicleNumber { get; set; }
         public bool IsOccupied { get; set; }
@@ -21,13 +19,7 @@ namespace Task1
         {
             SlotNumber = slotNumber;
             VehicleType = vehicleType;
-            IsOccupied = isOccupied;
-           
+            IsOccupied = isOccupied;      
         }
     }
-
-
-
-
-
 }

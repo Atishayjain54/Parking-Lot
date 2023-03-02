@@ -10,7 +10,6 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace Task1
 {
-
     class ParkingTicket
     {
         public int SlotNumber { get; set; }
@@ -20,8 +19,6 @@ namespace Task1
         public string TicketId { get; set; }
         public VehicleType VehicleType { get; set; }
         public double ParkingFee { get; set; }
-
-
         public ParkingTicket(int SlotNumber, string VehicleNumber, DateTime InTime,string TicketId)
         {
             this.SlotNumber = SlotNumber;
@@ -30,5 +27,4 @@ namespace Task1
             this.TicketId = TicketId;
         }
     }
-
 }
