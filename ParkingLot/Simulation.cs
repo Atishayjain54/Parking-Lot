@@ -1,16 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using Task1;
+using System;
+using ParkingLot.Repositories;
+using ParkingLot.Services;
+using ParkingLot.Models;
 
-namespace Task1
+
+namespace ParkingLot
 {
-     class Simulation
+    class Simulation
     {
-        public static void ParkVehicle(ParkingLotService ParkingLot)
+        private IParkingLotService _parkingLotService;
+        public Simulation(IParkingLotService parkingLotService) 
+        { 
+           _parkingLotService= parkingLotService;
+        }
+        public void ParkVehicle()
         {
             while (true)
             {
@@ -32,49 +36,49 @@ namespace Task1
                     Console.WriteLine(ex.Message);
                     continue;
                 }
-
-                VehicleType VehicleType = vehicleType switch
+                VehicleType vehicleTypeEnum = vehicleType switch
                 {
                     1 => VehicleType.TwoWheeler,
                     2 => VehicleType.FourWheeler,
                     3 => VehicleType.HeavyVehicle,
                 };
-                int SlotNumber = ParkingLot.IsSlotAvailable(VehicleType);
-                    if (SlotNumber != -1)
+                //VehicleType vehicleTypeEnum = (VehicleType)vehicleType;
+                int slotNumber = _parkingLotService.IsSlotAvailable(vehicleTypeEnum);
+                if (slotNumber != -1)
+                {
+                    Console.WriteLine($"\nEnter The Vehicle Number for {vehicleTypeEnum}");
+                    string vehicleNumber = Console.ReadLine();
+                    if (_parkingLotService.IsValidVehicleNumber(vehicleNumber))
                     {
-                        Console.WriteLine($"\nEnter The Vehicle Number for {VehicleType}");
-                        string VehicleNumber = Console.ReadLine();
-                        if (ParkingLot.IsValidVehicleNumber(VehicleNumber))
-                        {
-                            ParkingTicket ticket = ParkingLot.ParkingVehicle(SlotNumber, VehicleNumber, VehicleType);
-                            Console.WriteLine("\nParking ticket issued");
-                            Console.WriteLine($"Here is your Ticket Details.\n Ticket ID : {ticket.TicketId}\n Slot number: {ticket.SlotNumber}\n Vehicle number: {ticket.VehicleNumber}\n In Time: {ticket.InTime}\n");
-                            Console.WriteLine("Please save the Ticket ID for UnParking\n");
-                        }
-                        else
-                        {
-                            Console.WriteLine("\nPlease Enter Valid Vehicle Number");
-                        }
+                        ParkingTicket ticket = _parkingLotService.ParkVehicle(slotNumber, vehicleNumber, vehicleTypeEnum);
+                        Console.WriteLine("\nParking ticket issued");
+                        Console.WriteLine($"Here is your Ticket Details.\n Ticket ID : {ticket.TicketId}\n Slot number: {ticket.SlotNumber}\n Vehicle number: {ticket.VehicleNumber}\n In Time: {ticket.InTime}\n");
+                        Console.WriteLine("Please save the Ticket ID for UnParking\n");
                     }
                     else
                     {
-                        Console.WriteLine($"Slot is Not Available for {VehicleType}");
-                        Console.WriteLine("\n");
+                        Console.WriteLine("\nPlease Enter Valid Vehicle Number");
                     }
-                    break;
+                }
+                else
+                {
+                    Console.WriteLine($"Slot is Not Available for {vehicleTypeEnum}");
+                    Console.WriteLine("\n");
+                }
+                break;
             }
         }
-        public static void UnParkVehicle(ParkingLotService ParkingLot)
+        public void UnParkVehicle()
         {
             Console.WriteLine("Please Enter the Ticket ID");
             string ticketId = Console.ReadLine();
-            ParkingTicket ticket =ParkingLot.UnParkVehicle(ticketId);
-            if(ticket != null)
+            ParkingTicket ticket = _parkingLotService.UnParkVehicle(ticketId);
+            if (ticket != null)
             {
                 Console.WriteLine("Unparking ticket issued.\n Slot number :" + ticket.SlotNumber + " \n Vehicle number: " + ticket.VehicleNumber + "\nIn Time :" + ticket.InTime + "\nOut Time :" + ticket.OutTime);
                 Console.WriteLine("\n Unparked Vehicle");
-                double TotalPrice = ticket.ParkingFee;
-                Console.WriteLine("\nTotal parking price: $" + TotalPrice.ToString("0.00"));
+                double totalPrice = ticket.ParkingFee;
+                Console.WriteLine("\nTotal parking price: $" + totalPrice.ToString("0.00"));
                 Console.WriteLine("\n******************");
             }
             else
@@ -83,23 +87,23 @@ namespace Task1
                 Console.WriteLine("\n******************");
             }
         }
-        public static void DisplayOccupancy(ParkingLotService Parking)
+        public void DisplayOccupancy()
         {
-            Dictionary<VehicleType,int[]> OccupancyDetail = Parking.GetOccupancyDetails();
+            Dictionary<VehicleType, int[]> occupancyDetail = _parkingLotService.GetOccupancyDetails();
             Console.WriteLine("Display Occupancy:");
             Console.WriteLine("\n");
-            Console.WriteLine("Number of Two Wheeler Slot :" + OccupancyDetail[VehicleType.TwoWheeler][0]);
-            Console.WriteLine("Number of Four Wheeler Slot :" + OccupancyDetail[VehicleType.FourWheeler][0]);
-            Console.WriteLine("Number of Heavy Vehicle Slot :" + OccupancyDetail[VehicleType.HeavyVehicle][0]);
+            Console.WriteLine("Number of Two Wheeler Slot :" + occupancyDetail[VehicleType.TwoWheeler][0]);
+            Console.WriteLine("Number of Four Wheeler Slot :" + occupancyDetail[VehicleType.FourWheeler][0]);
+            Console.WriteLine("Number of Heavy Vehicle Slot :" + occupancyDetail[VehicleType.HeavyVehicle][0]);
 
             Console.WriteLine("\nAvailable Slots:");
             Console.WriteLine("\n");
 
-            Console.WriteLine("Number of Available TwoWheeler Slot :" + (OccupancyDetail[VehicleType.TwoWheeler][0] - OccupancyDetail[VehicleType.TwoWheeler][1]));
-            Console.WriteLine("Number of Available FourWheeler Slot :" + (OccupancyDetail[VehicleType.FourWheeler][0] - OccupancyDetail[VehicleType.FourWheeler][1]));
-            Console.WriteLine("Number of Available HeavyVehicle Slot :" + (OccupancyDetail[VehicleType.HeavyVehicle][0] - OccupancyDetail[VehicleType.HeavyVehicle][1]));
+            Console.WriteLine("Number of Available TwoWheeler Slot :" + (occupancyDetail[VehicleType.TwoWheeler][0] - occupancyDetail[VehicleType.TwoWheeler][1]));
+            Console.WriteLine("Number of Available FourWheeler Slot :" + (occupancyDetail[VehicleType.FourWheeler][0] - occupancyDetail[VehicleType.FourWheeler][1]));
+            Console.WriteLine("Number of Available HeavyVehicle Slot :" + (occupancyDetail[VehicleType.HeavyVehicle][0] - occupancyDetail[VehicleType.HeavyVehicle][1]));
             Console.WriteLine("\n******************");
-
         }
     }
 }
+

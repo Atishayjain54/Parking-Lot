@@ -1,13 +1,18 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using ParkingLot.Models;
+using ParkingLot.Services;
 
-namespace Task1
+namespace ParkingLot
 {
     class Program
     {
         static void Main(string[] args)
-        {
+        {           
+            IServiceProvider serviceProvider = StartUp.ConfigureServices();
             int NumberOfTwoWheelerSlot, NumberOfFourWheelerSlot, NumberOfHeavyVehicle;
-            ParkingLotService ParkingLot;
+            IParkingLotService ParkingLot = serviceProvider.GetService<IParkingLotService>();
+            Simulation simulation = serviceProvider.GetService<Simulation>();
 
             while (true)
             {
@@ -20,7 +25,7 @@ namespace Task1
                     Console.WriteLine("Enter Number of Heavy Vehicle Slot");
                     NumberOfHeavyVehicle = Convert.ToInt32(Console.ReadLine());
 
-                    ParkingLot = new ParkingLotService(NumberOfTwoWheelerSlot, NumberOfFourWheelerSlot, NumberOfHeavyVehicle);
+                    ParkingLot.Initialize(NumberOfTwoWheelerSlot, NumberOfFourWheelerSlot, NumberOfHeavyVehicle);
                     break;
                 }
                 catch (FormatException e)
@@ -45,15 +50,15 @@ namespace Task1
                     switch (Option)
                     {
                         case 1:
-                            Simulation.ParkVehicle(ParkingLot);
+                            simulation.ParkVehicle();
                             break;
 
                         case 2:
-                            Simulation.UnParkVehicle(ParkingLot);
+                            simulation.UnParkVehicle();
                             break;
 
                         case 3:
-                            Simulation.DisplayOccupancy(ParkingLot);
+                            simulation.DisplayOccupancy();
                             break;
 
                         case 4:

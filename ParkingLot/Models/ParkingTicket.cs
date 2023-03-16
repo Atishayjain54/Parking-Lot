@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Reflection.Metadata.BlobBuilder;
-using Task1;
+using ParkingLot.Models;
 using System.Data;
 using System.Reflection.Metadata.Ecma335;
 
-namespace Task1
+namespace ParkingLot.Models
 {
-    class ParkingTicket
-    {
+   public class ParkingTicket
+   {
         public int SlotNumber { get; set; }
         public string VehicleNumber { get; set; }
         public DateTime InTime { get; set; }
@@ -26,5 +26,5 @@ namespace Task1
             this.InTime = InTime;
             this.TicketId = TicketId;
         }
-    }
+   }
 }

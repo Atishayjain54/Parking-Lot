@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Task1;
+using ParkingLot.Models;
 
-namespace Task1
+namespace ParkingLot.Models
 {
-    class ParkingSlot
+   public class ParkingSlot
     {
         public int SlotNumber { get; set; }
         public string VehicleNumber { get; set; }

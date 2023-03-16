@@ -1,54 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
+using ParkingLot.Repositories;
+using ParkingLot.Models;
 
-namespace Task1
+
+namespace ParkingLot.Services
 {
-    class ParkingLotService
+    class ParkingLotService : IParkingLotService
     {
-        public ParkingSlot[] ParkingSlots;
+        //public ParkingSlot[] ParkingSlots;
 
-        public List<ParkingTicket> Tickets = new List<ParkingTicket>();
+       
+        IParkingTicketRepository _parkingTicketRepository;
+        IParkingSlotRepository _parkingSlotRepository;
+
+
+        // public List<ParkingTicket> Tickets = new List<ParkingTicket>();
 
         public int TwoWheelerSlots { get; set; }
         public int FourWheelerSlots { get; set; }
         public int HeavyVehicleSlots { get; set; }
         public int OccupiedTwoWheelerSlots { get; set;} = 0;
-        public int OccupiedFourWheelerSlots { get; set; } = 0;
-        public int OccupiedHeavyVehicleSlots { get; set; } = 0;
-        public ParkingLotService(int twoWheelerSlot, int fourWheelerSlot, int heavyVehicles)
+        public int OccupiedFourWheelerSlots { get; set;} = 0;
+        public int OccupiedHeavyVehicleSlots { get; set;} = 0;
+        public ParkingLotService(IParkingSlotRepository parkingSlotRepository, IParkingTicketRepository parkingTicketRepository)
+        {
+            _parkingSlotRepository = parkingSlotRepository;
+            _parkingTicketRepository = parkingTicketRepository;
+           
+        }
+        public void Initialize(int twoWheelerSlot, int fourWheelerSlot, int heavyVehicles)
         {
             TwoWheelerSlots = twoWheelerSlot;
             FourWheelerSlots = fourWheelerSlot;
             HeavyVehicleSlots = heavyVehicles;
 
-            ParkingSlots = new ParkingSlot[twoWheelerSlot + fourWheelerSlot + heavyVehicles];
-
             for (int i = 0; i < TwoWheelerSlots; i++)
             {
                 ParkingSlot parkingSlot = new ParkingSlot(i + 1, VehicleType.TwoWheeler, false);
-                ParkingSlots[i] = parkingSlot;
+                _parkingSlotRepository.AddSlot(parkingSlot);
             }
             for (int i = TwoWheelerSlots; i < TwoWheelerSlots + FourWheelerSlots; i++)
             {
                 ParkingSlot parkingSlot = new ParkingSlot(i + 1, VehicleType.FourWheeler, false);
-                ParkingSlots[i] = parkingSlot;
+                _parkingSlotRepository.AddSlot(parkingSlot);
             }
             for (int i = TwoWheelerSlots + FourWheelerSlots; i < TwoWheelerSlots + FourWheelerSlots + HeavyVehicleSlots; i++)
             {
                 ParkingSlot parkingSlot = new ParkingSlot(i + 1, VehicleType.HeavyVehicle, false);
-                ParkingSlots[i] = parkingSlot;
+                _parkingSlotRepository.AddSlot(parkingSlot);
             }
+
         }
         public int IsSlotAvailable(VehicleType VehicleType)
         {
-            foreach (ParkingSlot slot in ParkingSlots)
+            foreach(ParkingSlot slot in _parkingSlotRepository.GetAll())
             {
                 if (slot.VehicleType == VehicleType && !slot.IsOccupied)
                 {
@@ -62,7 +67,7 @@ namespace Task1
             Regex regex = new Regex(@"^[a-zA-Z]{2}\d{8}$");
             return regex.IsMatch(VehicleNumber);
         }
-        public ParkingTicket ParkingVehicle(int SlotNumber, string VehicleNumber, VehicleType VehicleType)
+        public ParkingTicket ParkVehicle(int SlotNumber, string VehicleNumber, VehicleType VehicleType)
         {
             if (VehicleType == VehicleType.TwoWheeler)
             {
@@ -80,11 +85,13 @@ namespace Task1
             }
 
             ParkingTicket ticket = GenerateTicket(SlotNumber, VehicleNumber, VehicleType);
-            
-            ParkingSlots[SlotNumber - 1].VehicleNumber = VehicleNumber;
-            ParkingSlots[SlotNumber - 1].IsOccupied = true;
+            var slot = _parkingSlotRepository.GetSlotBySlotNumber(SlotNumber );
+            slot.VehicleNumber = VehicleNumber;
+            slot.IsOccupied = true;
+            _parkingSlotRepository.UpdateSlot(SlotNumber, slot);
             ticket.VehicleType= VehicleType;
-            Tickets.Add(ticket);
+
+            _parkingTicketRepository.AddTicket(ticket);
             return ticket;
         }
         public ParkingTicket GenerateTicket(int SlotNumber, string VehicleNumber, VehicleType VehicleType)
@@ -105,17 +112,19 @@ namespace Task1
                 ticketId = "HV" + VehicleNumber.Substring(0, 4) + CurrentTime.ToString("yyyyMMddHHmmss");
             }
             ParkingTicket ticket = new ParkingTicket(SlotNumber, VehicleNumber, DateTime.Now, ticketId);
+
             return ticket;
         }
         public ParkingTicket UnParkVehicle(string TicketId)
         {
-            var ticket = Tickets.FirstOrDefault(t => t.TicketId == TicketId);
+            var ticket = _parkingTicketRepository.GetAll().FirstOrDefault(t => t.TicketId == TicketId);
 
             if (ticket != null)
             {
-                var slot = ticket.SlotNumber;
+                var slotNumber = ticket.SlotNumber;
+                var slot = _parkingSlotRepository.GetSlotBySlotNumber(slotNumber);
 
-                switch (ParkingSlots[slot - 1].VehicleType)
+                switch (slot.VehicleType)
                 {
                     case VehicleType.TwoWheeler:
                         OccupiedTwoWheelerSlots--;
@@ -127,17 +136,20 @@ namespace Task1
                         OccupiedHeavyVehicleSlots--;
                         break;
                 }
-                ParkingSlots[slot - 1].IsOccupied = false;
+                slot.IsOccupied = false;
+                _parkingSlotRepository.UpdateSlot(slotNumber, slot);
+                
                 ticket.OutTime = DateTime.Now;
                 CalculateParkingFee(ticket);
-
+                _parkingTicketRepository.UpdateTicket(ticket);
+                
                 return ticket;
+
             }
             return null;
         }
         public void CalculateParkingFee(ParkingTicket Ticket)
-        {
-           
+        {  
            double parkingRate = 0;
            double parkingDuration = (Ticket.OutTime - Ticket.InTime).TotalMinutes;
             switch (Ticket.VehicleType)
@@ -168,8 +180,11 @@ namespace Task1
              {VehicleType.FourWheeler, new int[] {FourWheelerSlots,OccupiedFourWheelerSlots} },
              {VehicleType.HeavyVehicle, new int[] {HeavyVehicleSlots,OccupiedHeavyVehicleSlots}}
             };
-           return VehicleSlots;
+            return VehicleSlots;
         }
+
+        
     }
 }
+
 
