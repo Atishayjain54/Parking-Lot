@@ -41,6 +41,6 @@ namespace ParkingLot.Repositories
                 existingSlot.VehicleNumber = slot.VehicleNumber;
                 existingSlot.VehicleType = slot.VehicleType;
             }
-
+        }
     }
 }

@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "odV6Ri75Fl8=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\atish\\OneDrive\\Desktop\\my projects\\parking_lot\\ParkingLot\\ParkingLot\\ParkingLot.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\atish\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\7.0.0\\microsoft.extensions.dependencyinjection.7.0.0.nupkg.sha512",
+    "C:\\Users\\atish\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\7.0.0\\microsoft.extensions.dependencyinjection.abstractions.7.0.0.nupkg.sha512",
+    "C:\\Users\\atish\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
